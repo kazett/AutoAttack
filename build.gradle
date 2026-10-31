@@ -28,11 +28,11 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
     modImplementation "maven.modrinth:midnightlib:${project.midnightlib_version}"
     include "maven.modrinth:midnightlib:${project.midnightlib_version}"
 }
 
-// flat root -> proper package structure at build time
 def genDir = layout.buildDirectory.get().asFile.toPath().resolve("generated").toFile()
 
 tasks.register('stageSources', Sync) {
@@ -60,9 +60,10 @@ tasks.named('compileJava') { dependsOn 'stageSources' }
 tasks.named('processResources') { dependsOn 'stageSources' }
 
 processResources {
-    inputs.property "mod_version", project.mod_version
+    inputs.property "version", project.version
+
     filesMatching("fabric.mod.json") {
-        expand "mod_version": project.mod_version
+        expand "version": inputs.properties.version
     }
 }
 
@@ -73,11 +74,8 @@ tasks.withType(JavaCompile).configureEach {
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
-    withSourcesJar()
 }
 
 jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
-    }
+    from("LICENSE")
 }
