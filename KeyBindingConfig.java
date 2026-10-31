@@ -1,5 +1,10 @@
 // ##kazet (c) 2022-2026 All rights reserved##
-package autoattack;
+package com.autoattack.config;
+
+import com.autoattack.AutoAttack;
+// AutoAttackConfig same package
+
+import com.autoattack.AutoAttack;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;

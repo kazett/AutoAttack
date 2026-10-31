@@ -12,11 +12,11 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "autoattack.Main"
+      "com.autoattack.Main"
     ],
     "client": [
-      "autoattack.AutoAttack",
-      "autoattack.KeyBindingConfig"
+      "com.autoattack.AutoAttack",
+      "com.autoattack.config.KeyBindingConfig"
     ]
   },
   "mixins": [

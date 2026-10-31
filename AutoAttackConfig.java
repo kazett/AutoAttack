@@ -1,5 +1,7 @@
 // ##kazet (c) 2022-2026 All rights reserved##
-package autoattack;
+package com.autoattack.config;
+
+import com.autoattack.AutoAttack;
 
 import eu.midnightdust.lib.config.MidnightConfig.Comment;
 import eu.midnightdust.lib.config.MidnightConfig.Entry;

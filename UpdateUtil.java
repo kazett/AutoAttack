@@ -1,5 +1,5 @@
 // ##kazet (c) 2022-2026 All rights reserved##
-package autoattack;
+package com.autoattack.util;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

@@ -1,5 +1,8 @@
 // ##kazet (c) 2022-2026 All rights reserved##
-package autoattack;
+package com.autoattack;
+
+import com.autoattack.config.AutoAttackConfig;
+import com.autoattack.util.UpdateUtil;
 
 import com.google.gson.JsonObject;
 import net.fabricmc.api.ClientModInitializer;
@@ -51,7 +54,7 @@ public class AutoAttack implements ClientModInitializer {
 		} catch (Exception ignored) {}
 
 		ClientTickEvents.END_CLIENT_TICK.register(mc -> {
-			if (UPDATE && AutoAttackConfig.checkUpdate && mc.player != null) {
+			if (UPDATE && com.autoattack.config.AutoAttackConfig.checkUpdate && mc.player != null) {
 				mc.player.sendMessage(Text.literal("AutoAttack: new Update Detected! Version: " + SERVER_VERSION), false);
 				UPDATE = false;
 			}
@@ -66,7 +69,7 @@ public class AutoAttack implements ClientModInitializer {
 			}
 
 			boolean holding = mc.options.attackKey.isPressed();
-			boolean canAttack = (holding || AutoAttackConfig.afkAttack)
+			boolean canAttack = (holding || com.autoattack.config.AutoAttackConfig.afkAttack)
 					&& mc.player != null && mc.world != null && mc.interactionManager != null;
 
 			if (canAttack && mc.player.getAttackCooldownProgress(0.5F) >= 1.0F) {
@@ -87,18 +90,18 @@ public class AutoAttack implements ClientModInitializer {
 				ItemStack stack = mc.player.getActiveItem();
 				Item item = stack.getItem();
 
-				if (item == Items.BOW && AutoAttackConfig.autoBow) {
+				if (item == Items.BOW && com.autoattack.config.AutoAttackConfig.autoBow) {
 					float progress = BowItem.getPullProgress(stack.getMaxUseTime() - mc.player.getItemUseTimeLeft() - 1);
 					if (progress == 1.0F) mc.interactionManager.stopUsingItem(mc.player);
 				}
-				if (item == Items.CROSSBOW && AutoAttackConfig.autoCrossBow) {
+				if (item == Items.CROSSBOW && com.autoattack.config.AutoAttackConfig.autoCrossBow) {
 					float progress = (stack.getMaxUseTime() - mc.player.getItemUseTimeLeft()) / (float) CrossbowItem.getPullTime(stack);
 					if (progress > 1.0F) {
 						mc.interactionManager.stopUsingItem(mc.player);
 						mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
 					}
 				}
-				if (item == Items.TRIDENT && AutoAttackConfig.autoTrident) {
+				if (item == Items.TRIDENT && com.autoattack.config.AutoAttackConfig.autoTrident) {
 					float progress = (stack.getMaxUseTime() - mc.player.getItemUseTimeLeft()) / 10.0F;
 					if (progress > 1.0F) mc.interactionManager.stopUsingItem(mc.player);
 				}
@@ -110,7 +113,7 @@ public class AutoAttack implements ClientModInitializer {
 	private static boolean isValidTarget(Entity e, net.minecraft.client.MinecraftClient mc) {
 		if (e == null || !e.isAlive() || !e.isAttackable() || e == mc.player) return false;
 
-		return switch (AutoAttackConfig.targetMode) {
+		return switch (com.autoattack.config.AutoAttackConfig.targetMode) {
 			case HOSTILE -> e instanceof Monster;
 			case EVERYONE -> e instanceof LivingEntity;
 			case ALL -> true;
@@ -122,7 +125,7 @@ public class AutoAttack implements ClientModInitializer {
 
 		Entity target = null;
 
-		if (mc.crosshairTarget.getType() == HitResult.Type.BLOCK && AutoAttackConfig.cleanCut) {
+		if (mc.crosshairTarget.getType() == HitResult.Type.BLOCK && com.autoattack.config.AutoAttackConfig.cleanCut) {
 			BlockHitResult blockHit = (BlockHitResult) mc.crosshairTarget;
 			BlockPos pos = blockHit.getBlockPos();
 			BlockState state = mc.world.getBlockState(pos);

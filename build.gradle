@@ -38,11 +38,10 @@ def genDir = layout.buildDirectory.get().asFile.toPath().resolve("generated").to
 tasks.register('stageSources', Sync) {
     into genDir
 
-    from(files(
-        'AutoAttack.java', 'Main.java', 'AutoAttackConfig.java',
-        'KeyBindingConfig.java', 'AutoAttackMixin.java', 'GameRenderMixin.java',
-        'UpdateUtil.java'
-    )) { into 'java/autoattack' }
+    from(files('AutoAttack.java', 'Main.java')) { into 'java/com/autoattack' }
+    from(files('AutoAttackConfig.java', 'KeyBindingConfig.java')) { into 'java/com/autoattack/config' }
+    from(files('AutoAttackMixin.java', 'GameRenderMixin.java')) { into 'java/com/autoattack/mixin' }
+    from(files('UpdateUtil.java')) { into 'java/com/autoattack/util' }
 
     from(files('fabric.mod.json', 'autoattack.mixins.json')) { into 'resources' }
     from(files('icon.png')) { into 'resources/assets/autoattack' }

@@ -1,5 +1,7 @@
 // ##kazet (c) 2022-2026 All rights reserved##
-package autoattack;
+package com.autoattack.mixin;
+
+import com.autoattack.config.AutoAttackConfig;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
