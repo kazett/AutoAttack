@@ -1,61 +1,83 @@
 plugins {
-	id 'fabric-loom' version '1.4-SNAPSHOT'
-	id 'maven-publish'
+    id 'fabric-loom' version "${loom_version}"
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = project.archives_base_name
-version = "mc${project.supported_versions}-v${project.mod_version}"
+version = project.mod_version
 group = project.maven_group
 
-// flat layout: all sources & resources in project root
-sourceSets {
-	main {
-		java {
-			srcDirs = ['.']
-			exclude 'build/**', '.gradle/**', 'gradle/**', '.github/**'
-		}
-		resources {
-			srcDirs = ['.']
-			exclude '**/*.java', 'build/**', '.gradle/**', 'gradle/**', '.github/**', 'gradlew', 'gradlew.bat', 'build.gradle', 'settings.gradle', 'gradle.properties', '.gitignore'
-		}
-	}
+base {
+    archivesName = project.archives_base_name
 }
 
 repositories {
-	maven {
-		url = "https://api.modrinth.com/maven"
-	}
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation "maven.modrinth:midnightlib:${project.midnightlib_version}"
-	include "maven.modrinth:midnightlib:${project.midnightlib_version}"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "maven.modrinth:midnightlib:${project.midnightlib_version}"
+    include "maven.modrinth:midnightlib:${project.midnightlib_version}"
 }
 
+// flat root -> proper package structure at build time
+def genDir = layout.buildDirectory.get().asFile.toPath().resolve("generated").toFile()
+
+tasks.register('stageSources', Sync) {
+    into genDir
+
+    from(files(
+        'AutoAttack.java', 'Main.java', 'AutoAttackConfig.java',
+        'KeyBindingConfig.java', 'AutoAttackMixin.java', 'GameRenderMixin.java',
+        'UpdateUtil.java'
+    )) { into 'java/autoattack' }
+
+    from(files('fabric.mod.json', 'autoattack.mixins.json')) { into 'resources' }
+    from(files('icon.png')) { into 'resources/assets/autoattack' }
+    from(files('en_us.json', 'pt_br.json', 'zh_cn.json')) { into 'resources/assets/autoattack/lang' }
+}
+
+sourceSets {
+    main {
+        java.setSrcDirs([new File(genDir, 'java')])
+        resources.setSrcDirs([new File(genDir, 'resources')])
+    }
+}
+
+tasks.named('compileJava') { dependsOn 'stageSources' }
+tasks.named('processResources') { dependsOn 'stageSources' }
+
 processResources {
-	inputs.property "mod_version", project.mod_version
-	filesMatching("fabric.mod.json") {
-		expand "mod_version": project.mod_version
-	}
+    inputs.property "mod_version", project.mod_version
+    filesMatching("fabric.mod.json") {
+        expand "mod_version": project.mod_version
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
+    it.options.release = 17
 }
 
 java {
-	withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
 }
 
 jar {
-	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
-	}
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
 }
